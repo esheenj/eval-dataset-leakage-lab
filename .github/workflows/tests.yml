@@ -1,0 +1,45 @@
+name: Tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Pure audit engine and adversarial tests
+        run: npm test
+      - name: Static site safety
+        run: npm run check:site
+      - name: Synthetic dataset report sanity
+        run: |
+          node bin/audit.mjs > /tmp/dataset-audit.json
+          node --input-type=module -e "import fs from 'node:fs';const x=JSON.parse(fs.readFileSync('/tmp/dataset-audit.json'));if(x.reports.length!==3||x.reports[0].status!=='CHECKS_PASS'||x.reports[1].status!=='LEAKAGE_OR_ERRORS'||x.reports[2].status!=='REVIEW_WARNINGS'||x.reports.some(r=>r.realDataPrivacyVerified||r.modelPerformanceVerified))process.exit(1)"
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Stage the exact source-only Pages bundle
+        run: npm run stage
+      - name: Verify interactive behaviour in real Chrome
+        run: |
+          google-chrome --version
+          npm run browser:smoke

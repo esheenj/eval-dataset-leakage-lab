@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark">
+<meta name="description" content="Explore split contamination, duplicate prompts and missing labels in a safe offline AI evaluation dataset playground.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Evaluation Dataset Leakage Lab — Esheen Labs</title>
+<style>
+:root{font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color-scheme:dark;--bg:#07110d;--panel:#101f17;--panel2:#182c20;--ink:#f2f9f3;--muted:#acc5b5;--line:#335642;--green:#b8f48c;--mint:#80e6bc;--warn:#ffd28e;--red:#ffa7a7}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:radial-gradient(ellipse 60% 28% at 85% 0%,#22553664,transparent 80%),var(--bg);overflow-wrap:anywhere}
+a{color:var(--green);text-underline-offset:.22em}a:focus-visible,button:focus-visible,textarea:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.wrap{width:min(100% - 2rem,74rem);margin:auto}.skip{position:absolute;left:.8rem;top:-6rem;background:var(--green);color:#06120a;padding:.6rem 1rem;z-index:4}.skip:focus{top:.7rem}
+.top{border-bottom:1px solid #ffffff23}.top-inner{min-height:5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.brand{text-decoration:none;display:flex;gap:.7rem;align-items:center;color:var(--ink);font-weight:850;letter-spacing:.03em}.mark{width:2.5rem;height:2.5rem;border:1px solid #a0f3b184;border-radius:.7rem;display:grid;place-items:center;font-size:1.5rem;color:var(--green);background:linear-gradient(140deg,#285938,#0e1a13)}.brand small{display:block;color:var(--mint);font-size:.6rem;letter-spacing:.19em;line-height:1.1}
+.links{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;font-size:.83rem}.links a{text-decoration:none}
+.hero{padding:clamp(3rem,7vw,5rem) 0 3rem;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(12rem,.85fr);gap:2rem;align-items:center}
+.kicker{text-transform:uppercase;letter-spacing:.16em;color:var(--mint);font-size:.7rem;font-weight:800}.hero h1{font-size:clamp(2.6rem,6vw,5.6rem);line-height:1.04;letter-spacing:-.067em;margin:.8rem 0 1.15rem;max-width:13ch}.hero h1 em{font-style:normal;color:var(--green)}
+.lead{color:var(--muted);max-width:55ch;font-size:clamp(1rem,1.55vw,1.2rem)}.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.6rem}.chips span{color:#d1e9d4;border:1px solid #b4e5b650;border-radius:99px;padding:.33rem .65rem;font-size:.72rem}
+.art{aspect-ratio:1.18;display:grid;place-items:center;position:relative;isolation:isolate}.art:before{content:"";position:absolute;z-index:-1;inset:14%;background:radial-gradient(circle,#67c58d45,transparent 70%);filter:blur(16px)}
+.bubble{width:65%;height:65%;position:relative;border:1px solid #adea9b63;border-radius:1.3rem;transform:rotate(-8deg);background:repeating-linear-gradient(90deg,transparent,transparent 14%,#ffffff08 14%,#ffffff08 15%),linear-gradient(150deg,#1a3e2a,#0f2015);box-shadow:0 30px 60px #0006}
+.bubble:before{content:"TRAIN  →  EVAL  →  TEST";position:absolute;top:1.1rem;left:1.1rem;font:700 clamp(.55rem,1.1vw,.8rem) ui-monospace,monospace;letter-spacing:.14em;color:#b6f4a6}.art-node{position:absolute;width:1.65rem;height:1.65rem;border:1px solid #a2f7b9;box-shadow:0 0 30px #a5f4aa5c;border-radius:.5rem;background:#8add9a}
+.n1{top:32%;left:18%}.n2{top:52%;left:43%;background:#ffd295;border-color:#ffe8b2}.n3{top:32%;right:16%}.n4{bottom:17%;right:25%}
+.art-line{position:absolute;height:2px;background:linear-gradient(90deg,#aaf6a7,#ffd79a);left:30%;right:25%;top:43%;transform:rotate(20deg)}.art-label{position:absolute;left:-5%;bottom:-10%;background:#10251a;border:1px solid #baf58b5c;border-radius:.7rem;color:var(--green);padding:.5rem .8rem;font-size:.7rem;font-weight:760}
+.sectionhead{margin:.5rem 0 1.4rem}.sectionhead h2{font-size:clamp(1.8rem,3.5vw,2.8rem);letter-spacing:-.04em;margin:.35rem 0;line-height:1.14}.sectionhead p{color:var(--muted);max-width:65ch;margin:.3rem 0}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}.panel{background:linear-gradient(150deg,#13261a,#0c1b12);border:1px solid #ffffff23;border-radius:1.1rem;padding:clamp(1rem,2.6vw,1.6rem);min-width:0}
+.panel h3{font-size:1.25rem;letter-spacing:-.03em;line-height:1.22;margin:.4rem 0}.muted{color:var(--muted);font-size:.85rem}
+.scenarios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin:1.2rem 0}.tab{min-height:57px;text-align:left;background:#ffffff08;color:var(--muted);border:1px solid #ffffff25;border-radius:.7rem;padding:.7rem;font:760 .8rem system-ui;cursor:pointer}
+.tab[aria-pressed="true"]{color:var(--green);background:#a3f7a713;border-color:#b9eaa29e}.tab:hover{border-color:#b9eaa29e}
+label{display:block;margin:.8rem 0 .5rem;font-size:.84rem;font-weight:760}textarea{display:block;width:100%;height:17rem;resize:vertical;background:#04130c;border:1px solid var(--line);color:var(--ink);border-radius:.65rem;font:.74rem/1.6 ui-monospace,SFMono-Regular,monospace;padding:.8rem;tab-size:2}
+.toolbar{display:flex;gap:.6rem;flex-wrap:wrap;margin:1rem 0}.btn{min-height:44px;border:1px solid var(--green);border-radius:.65rem;padding:.6rem .9rem;font-weight:790;font-size:.86rem;cursor:pointer;background:var(--green);color:#0a1d0e}
+.btn:hover{background:#d5ffb7}.btn.secondary{background:#ffffff05;color:var(--ink);border-color:#ffffff4d}.btn.secondary:hover{background:#ffffff14}
+.summary{margin:1.1rem 0;border:1px solid #a7e8ac48;background:#aadba90d;border-radius:.8rem;padding:1rem}.state{font-size:.72rem;color:var(--green);border:1px solid #94eaa2;border-radius:99px;padding:.28rem .65rem;font-weight:800;letter-spacing:.055em}
+body[data-state="LEAKAGE_OR_ERRORS"] .state{color:var(--red);border-color:var(--red)}body[data-state="REVIEW_WARNINGS"] .state{color:var(--warn);border-color:var(--warn)}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin-top:1rem}.metric{border-left:1px solid #ffffff42;padding-left:.65rem}.metric strong{font-size:1.65rem;letter-spacing:-.05em;line-height:1.1;display:block}.metric small{color:var(--muted);font-size:.7rem}
+#results{list-style:none;padding:0;margin:1rem 0;display:grid;gap:.65rem}.finding{border-radius:.75rem;background:#ffffff07;border:1px solid #ffffff23;padding:.8rem}
+.finding-head{display:flex;justify-content:space-between;gap:.6rem;align-items:start}.finding strong{font-size:.84rem;overflow-wrap:anywhere}.level{color:var(--warn);font-size:.67rem;font-weight:800}.finding[data-level="ERROR"] .level{color:var(--red)}.finding p{color:var(--muted);font-size:.78rem;margin:.4rem 0}.finding small{font: .67rem ui-monospace,monospace;color:#a7d8b7}
+#next{color:var(--muted);font-size:.85rem}
+details{margin-top:1rem;border-top:1px solid #ffffff24;padding-top:.5rem}summary{cursor:pointer;color:var(--green);min-height:40px;padding:.5rem 0;font-size:.83rem;font-weight:750}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:16rem;overflow:auto;background:#05150c;border:1px solid #ffffff23;border-radius:.65rem;padding:1rem;font:.71rem/1.55 ui-monospace,monospace}
+.bottom{margin-top:3rem;padding:2.5rem 0 4rem;border-top:1px solid #ffffff27;display:grid;grid-template-columns:1fr 1fr;gap:2rem}.bottom h3{margin:.3rem 0;font-size:1.2rem}.bottom p{color:var(--muted);font-size:.86rem}
+@media(max-width:840px){.hero{grid-template-columns:1fr}.art{display:none}.workspace{grid-template-columns:1fr}}
+@media(max-width:500px){.wrap{width:min(100% - 1.3rem,74rem)}.brand{font-size:.82rem;gap:.4rem}.mark{width:2.1rem;height:2.1rem}.links{gap:.55rem;font-size:.73rem}.hero h1{font-size:clamp(2.5rem,11vw,3.6rem)}.scenarios{grid-template-columns:1fr}.bottom{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body data-state="PENDING" data-scenario="loading">
+<a class="skip" href="#workspace">Skip to dataset workbench</a>
+<nav class="top"><div class="wrap top-inner"><a class="brand" href="https://esheenj.github.io/compound-intelligence-starter/"><span class="mark" aria-hidden="true">Σ</span><span>ESHEEN LABS<small>OPEN INTELLIGENCE</small></span></a><div class="links"><a href="https://esheenj.github.io/compound-intelligence-starter/">All projects</a><a href="https://github.com/esheenj/eval-dataset-leakage-lab">Source</a></div></div></nav>
+<header class="wrap hero"><div><p class="kicker">AI evaluation / Dataset quality</p><h1>Better data.<br><em>Fairer tests.</em></h1><p class="lead">Catch duplicate prompts, training-set leakage and label imbalance before trusting an AI evaluation. Explore a completely fictional dataset, edit the records and see what needs review.</p><div class="chips"><span>3 example scenarios</span><span>No model call</span><span>Offline-friendly</span><span>Open-source checks</span></div></div><div class="art" aria-hidden="true"><span class="bubble"><span class="art-line"></span><span class="art-node n1"></span><span class="art-node n2"></span><span class="art-node n3"></span><span class="art-node n4"></span><span class="art-label">LEAKAGE DETECTED ?</span></span></div></header>
+<main class="wrap" id="workspace"><div class="sectionhead"><p class="kicker">01 / Inspect a dataset</p><h2>See the blind spots before you benchmark.</h2><p>Try a clean sample, intentionally contaminated train/eval records or a skewed label distribution. This is a local structural audit, not proof of source authenticity or benchmark reliability.</p></div>
+<div class="workspace">
+<section class="panel" aria-labelledby="input-title"><p class="kicker">INPUTS / SYNTHETIC DATA</p><h3 id="input-title">Choose your scenario</h3><div id="scenarios" class="scenarios" aria-label="Fictional evaluation scenarios"></div><p class="muted" id="scenario-description"></p>
+<label for="dataset-json">Edit the dataset JSON (fictional data only)</label><textarea id="dataset-json" spellcheck="false" maxlength="48000"></textarea><div class="toolbar"><button id="audit" type="button" class="btn">Run local checks ↗</button><button id="reset" type="button" class="btn secondary">Restore example</button></div>
+<p class="muted">No data is uploaded, stored or sent to an AI model. Supported checks include normalized prompt overlap across splits, duplicate IDs, missing labels and distribution warnings.</p></section>
+<section class="panel" aria-labelledby="results-title"><p class="kicker">OUTPUT / INSPECTABLE FINDINGS</p><h3 id="results-title">Audit results, explained</h3><p class="muted">Every finding includes a code and affected record identifiers. Passing these checks does not establish privacy, model quality or statistical validity.</p>
+<div class="summary"><span class="state" id="state" role="status" aria-live="polite">PREPARING</span><div id="metrics" class="metrics"></div></div>
+<ol id="results" aria-label="Dataset quality findings"></ol><p id="next">Choose a sample to begin.</p>
+<details><summary>Inspect JSON audit receipt</summary><pre id="receipt">No report yet</pre></details></section></div>
+<section class="bottom"><div><p class="kicker">02 / For developers</p><h3>Build reproducible dataset checks.</h3><p>The browser and Node CLI share one deterministic engine. Clone the project, run the negative tests and extend the documented synthetic fixture set.</p><p><a href="https://github.com/esheenj/eval-dataset-leakage-lab">View code and contribution guide</a> · <a href="https://esheenj.github.io/compound-intelligence-starter/">Explore other Labs</a></p></div>
+<div><p class="kicker">TRUST BOUNDARY</p><h3>Leakage signals ≠ complete validation.</h3><p>Normalized-prompt matching is an illustrative heuristic, not embedding-based near-duplicate detection or a full contamination study. These offline examples cannot certify real-data privacy, annotation quality, provenance or model performance.</p></div></section>
+</main><script type="module" src="./app.mjs"></script>
+</body></html>
