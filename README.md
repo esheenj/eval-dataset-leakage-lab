@@ -1,5 +1,7 @@
 # Evaluation Dataset Leakage Lab
 
+**Support this open-source project (optional):** [Esheen Labs crypto support](https://esheenj.github.io/compound-intelligence-starter/support.html) accepts maintainer-supplied BTC on Bitcoin and USDT on Solana, Ethereum/ERC-20 or Tron/TRC-20. The destination addresses are **custodial Pionex exchange deposits** and may change; check the exact network, current address and minimum before sending. Contributions do not buy priority, access or execution authority. All demos and source remain free.
+
 **Discover hidden contamination before relying on an AI benchmark.**
 
 An original, independent Esheen Labs open-source project for examining **fictional** evaluation datasets. Compare train/eval/test splits, duplicate prompts, missing labels, small evaluation samples and label distribution. Run it in your browser or locally in Node.js.
