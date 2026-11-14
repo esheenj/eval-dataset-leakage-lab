@@ -1,4 +1,9 @@
-# Evaluation Dataset Leakage Lab
+# Evaluation Dataset Leakage Inspector
+
+**Product identity:** **Evaluation Dataset Leakage Inspector** is a deterministic offline checker for supplied fictional AI evaluation records. It flags exact or normalized prompt reuse across splits, repeated IDs, label gaps and distribution warnings using transparent rules.
+
+**For:** AI application developers, evaluation engineers and teams preparing benchmark fixtures. Results are structural hints only, not semantic contamination detection, proof of model memorization, regulatory certification or real benchmark validity. The existing CLI, repository, package name and public demo address remain unchanged.
+
 
 **Support this open-source project (optional):** [Esheen Labs crypto support](https://esheenj.github.io/compound-intelligence-starter/support.html) accepts maintainer-supplied BTC on Bitcoin and USDT on Solana, Ethereum/ERC-20 or Tron/TRC-20. The destination addresses are **custodial Pionex exchange deposits** and may change; check the exact network, current address and minimum before sending. Contributions do not buy priority, access or execution authority. All demos and source remain free.
 
